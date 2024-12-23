@@ -9,6 +9,12 @@
       stroke: steelblue;
       stroke-width: 2;
     }
+
+    circle {
+      fill: steelblue;
+      stroke: white;
+      stroke-width: 1;
+    }
   </style>
 </head>
 
@@ -38,6 +44,22 @@
     svg.append("path")
      .datum(data)
      .attr("d", line);
+
+    svg.selectAll(".dot")
+     .data(data)
+     .enter()
+     .append("circle")
+     .attr("cx", (d, i) => xScale(i))
+     .attr("cy", (d) => yScale(d))
+     .attr("r", 4);
+
+    svg.selectAll(".text")
+     .data(data)
+     .enter()
+     .append("text")
+     .attr("x", (d, i) => xScale(i))
+     .attr("y", (d) => yScale(d) - 10)
+     .text((d) => d);
   </script>
 </body>
 
