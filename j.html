@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    path {
+      fill: none;
+      stroke: steelblue;
+      stroke-width: 2;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    const data = [10, 20, 30, 25, 35];
+    const svgWidth = 400;
+    const svgHeight = 300;
+
+    const svg = d3.select("body")
+     .append("svg")
+     .attr("width", svgWidth)
+     .attr("height", svgHeight);
+
+    const xScale = d3.scaleLinear()
+     .domain([0, data.length - 1])
+     .range([0, svgWidth]);
+
+    const yScale = d3.scaleLinear()
+     .domain([0, d3.max(data)])
+     .range([svgHeight, 0]);
+
+    const line = d3.line()
+     .x((d, i) => xScale(i))
+     .y((d) => yScale(d));
+
+    svg.append("path")
+     .datum(data)
+     .attr("d", line);
+  </script>
+</body>
+
+</html>
