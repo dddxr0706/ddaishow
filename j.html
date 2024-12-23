@@ -41,25 +41,81 @@
      .x((d, i) => xScale(i))
      .y((d) => yScale(d));
 
-    svg.append("path")
-     .datum(data)
-     .attr("d", line);
+    // 初始状态，数据为空数组
+    let animatedData = [];
+
+    const path = svg.append("path")
+     .datum(animatedData)
+     .attr("d", line)
+     .transition()
+     .duration(2000)
+     .ease(d3.easeLinear)
+     .attrTween("stroke-dasharray", tweenDash)
+     .attrTween("stroke-dashoffset", tweenDashOffset)
+     .on("end", function () {
+        // 动画结束后，设置数据为实际数据
+        d3.select(this).datum(data);
+      });
 
     svg.selectAll(".dot")
-     .data(data)
+     .data(animatedData)
      .enter()
      .append("circle")
      .attr("cx", (d, i) => xScale(i))
      .attr("cy", (d) => yScale(d))
-     .attr("r", 4);
+     .attr("r", 4)
+     .transition()
+     .duration(2000)
+     .ease(d3.easeLinear)
+     .attr("cx", (d, i) => xScale(i))
+     .attr("cy", (d) => yScale(d));
 
     svg.selectAll(".text")
-     .data(data)
+     .data(animatedData)
      .enter()
      .append("text")
      .attr("x", (d, i) => xScale(i))
      .attr("y", (d) => yScale(d) - 10)
-     .text((d) => d);
+     .text((d) => d)
+     .transition()
+     .duration(2000)
+     .ease(d3.easeLinear)
+     .attr("x", (d, i) => xScale(i))
+     .attr("y", (d) => yScale(d) - 10);
+
+    function tweenDash() {
+      const length = this.getTotalLength();
+      return function (t) {
+        return (d3.interpolateString(`0 ${length}`, `${length} 0`)(t));
+      };
+    }
+
+    function tweenDashOffset() {
+      const length = this.getTotalLength();
+      return function (t) {
+        return length * (1 - t);
+      };
+    }
+
+    // 每隔一段时间更新动画数据
+    let index = 0;
+    setInterval(() => {
+      if (index < data.length) {
+        animatedData.push(data[index]);
+        index++;
+        // 更新路径和点的位置
+        path.datum(animatedData);
+        svg.selectAll(".dot")
+         .data(animatedData)
+         .attr("cx", (d, i) => xScale(i))
+         .attr("cy", (d) => yScale(d));
+        svg.selectAll(".text")
+         .data(animatedData)
+         .text((d) => d)
+         .attr("x", (d, i) => xScale(i))
+         .attr("y", (d) => yScale(d) - 10);
+      }
+    }, 500);
   </script>
 </body>
 
